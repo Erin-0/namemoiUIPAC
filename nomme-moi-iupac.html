@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <title>IUPAC — Nomme-moi</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf8f3;
+            --ink: #23262d;
+            --ok: #1f9d55;
+            --bad: #d62839;
+            --warn: #f08a24;
+            --acc: #3b5bdb;
+            --line: #e6e1d6;
+            --f: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+            --m: 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            margin: 0;
+            height: 100%
+        }
+
+        body {
+            font-family: var(--f);
+            color: var(--ink);
+            background-color: var(--bg);
+            background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+            background-size: 56px 56px;
+            overflow: hidden
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer
+        }
+
+        #warn {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99;
+            background: var(--bg);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            font-size: 20px
+        }
+
+        @media(max-width:899px) {
+            #warn {
+                display: flex
+            }
+        }
+
+        #menuBtn {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            z-index: 30;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            border: 2px solid var(--ink);
+            background: #fff;
+            font-size: 22px
+        }
+
+        #side {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 360px;
+            z-index: 20;
+            background: #fffdf8;
+            border-right: 2px solid var(--ink);
+            transform: translateX(-100%);
+            transition: .35s;
+            padding: 80px 18px 18px;
+            overflow: auto
+        }
+
+        #side.open {
+            transform: none
+        }
+
+        #side h2 {
+            margin: 0 0 4px
+        }
+
+        #side small {
+            color: #777
+        }
+
+        .card {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin: 12px 0;
+            padding: 10px;
+            border: 2px solid var(--line);
+            border-radius: 14px;
+            background: #fff;
+            cursor: pointer;
+            transition: .2s;
+            position: relative
+        }
+
+        .card:hover {
+            border-color: var(--acc);
+            transform: translateX(4px)
+        }
+
+        .card.done {
+            border-color: #e0b100;
+            background: #fff9e0
+        }
+
+        .card svg {
+            width: 110px;
+            height: 80px;
+            flex: none
+        }
+
+        .card b {
+            display: block
+        }
+
+        .star {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            color: #e0b100;
+            font-weight: 800
+        }
+
+        main {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 1300px;
+            padding: 20px
+        }
+
+        .screen.on {
+            display: block
+        }
+
+        h1 {
+            font-size: 58px;
+            margin: 0 0 10px;
+            font-weight: 800
+        }
+
+        .big {
+            padding: 14px 38px;
+            font-size: 20px;
+            font-weight: 800;
+            border-radius: 16px;
+            border: 2px solid var(--ink);
+            background: var(--acc);
+            color: #fff;
+            box-shadow: 4px 4px 0 var(--ink)
+        }
+
+        .big:disabled {
+            opacity: .35;
+            cursor: not-allowed
+        }
+
+        .big.alt {
+            background: #fff;
+            color: var(--ink)
+        }
+
+        #count {
+            font-size: 200px;
+            font-weight: 800;
+            color: var(--acc);
+            animation: pop .9s ease-out
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(2.4);
+                opacity: 0
+            }
+
+            30% {
+                opacity: 1
+            }
+
+            100% {
+                transform: scale(.8);
+                opacity: .2
+            }
+        }
+
+        #timer {
+            position: fixed;
+            top: 22px;
+            right: 28px;
+            font: 700 24px var(--m);
+            background: #fff;
+            border: 2px solid var(--ink);
+            border-radius: 12px;
+            padding: 4px 14px
+        }
+
+        #stopBtn {
+            position: fixed;
+            top: 22px;
+            right: 190px;
+            font: 700 16px var(--f);
+            background: #fff;
+            border: 2px solid var(--ink);
+            border-radius: 12px;
+            padding: 8px 14px;
+            cursor: pointer;
+            z-index: 10
+        }
+
+        #stage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 26px;
+            height: 50vh
+        }
+
+        #draw {
+            flex: 1 1 100%;
+            height: 100%;
+            transition: flex .6s;
+            position: relative
+        }
+
+        #draw svg {
+            height: 100%;
+            max-width: 100%
+        }
+
+        #draw.glass svg {
+            opacity: .08;
+            filter: blur(6px);
+            pointer-events: none;
+            transition: opacity .3s, filter .3s
+        }
+
+        #draw.glass::before {
+            content: '⏸ En pause';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font: 800 24px var(--f);
+            color: var(--ink);
+            opacity: .6;
+            z-index: 5;
+            pointer-events: none
+        }
+
+        #draw svg {
+            height: 100%;
+            max-width: 100%
+        }
+
+        circle[data-a] {
+            fill: transparent;
+            cursor: pointer
+        }
+
+        circle[data-a]:hover {
+            fill: rgba(59, 91, 219, .2)
+        }
+
+        #card {
+            flex: 0 0 0;
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            padding: 0;
+            border: 0 solid var(--ink);
+            border-radius: 18px;
+            background: #fff;
+            text-align: left;
+            transition: .6s;
+            height: 100%
+        }
+
+        .res #card {
+            flex: 0 0 410px;
+            width: 410px;
+            opacity: 1;
+            padding: 20px;
+            border-width: 2px;
+            box-shadow: 5px 5px 0 var(--ink);
+            overflow: auto
+        }
+
+        .res #draw {
+            flex: 1 1 0
+        }
+
+        #typed {
+            margin: 14px auto 10px;
+            min-height: 76px;
+            border-bottom: 2px dashed #bbb;
+            font-family: var(--m);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            cursor: text;
+            line-height: 76px;
+            outline: none
+        }
+
+        .res #typed {
+            border-bottom-style: solid;
+            cursor: default
+        }
+
+
+
+        @keyframes bl {
+            50% {
+                opacity: 0
+            }
+        }
+
+
+
+        .g {
+            color: var(--ok);
+            font-weight: 700
+        }
+
+        .m {
+            color: var(--bad);
+            font-weight: 700;
+            background: #ffe3e6
+        }
+
+        .x {
+            color: var(--warn);
+            text-decoration: line-through
+        }
+
+        .n {
+            color: #aaa
+        }
+
+        .pct {
+            font-size: 64px;
+            font-weight: 800;
+            line-height: 1
+        }
+
+        .pct.win {
+            color: var(--ok)
+        }
+
+        .pct.lose {
+            color: var(--bad)
+        }
+
+        #banner {
+            display: none;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--ok);
+            margin-bottom: 6px
+        }
+
+        #learn {
+            font-size: 17px;
+            line-height: 1.55
+        }
+
+        #learn code {
+            font-family: var(--m);
+            font-weight: 700
+        }
+
+        #acts {
+            display: none;
+            margin-top: 6px;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap
+        }
+
+        .res #acts {
+            display: flex
+        }
+
+        .res #check {
+            display: none
+        }
+
+        .hint {
+            color: #888;
+            font-size: 14px;
+            margin: 0
+        }
+
+        body {
+            -webkit-user-select: none;
+            /* Safari */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* IE10+ */
+            user-select: none;
+            /* Standard */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="warn">
+        <div>📵<br>Ce site est conçu pour les ordinateurs.<br>Ouvrez-le sur un écran plus large (≥ 900 px).</div>
+    </div>
+    <button id="menuBtn" title="Composés">☰</button>
+    <aside id="side">
+        <h2>Composés</h2><small>Cliquez sur une carte pour jouer ce composé</small>
+        <div id="list"></div>
+    </aside>
+    <div id="timer" style="display:none">0:00.0</div>
+    <button id="stopBtn" style="display:none">⏸ Stop</button>
+    <main>
+        <section class="screen on" id="sHome">
+            <h1>Nomme-moi ! ⚗️</h1>
+            <p style="font-size:20px">Observe la molécule, écris son nom IUPAC.</p><button class="big" id="rand">Jouer
+                aléatoire</button>
+        </section>
+        <section class="screen" id="sCount">
+            <div id="count"></div>
+        </section>
+        <section class="screen" id="sPlay">
+            <div id="stage">
+                <div id="draw"></div>
+                <div id="card">
+                    <div id="banner">🏆 Victoire !</div>
+                    <div class="pct" id="pct"></div>
+                    <p id="time" style="margin:8px 0"></p>
+                    <div id="learn"></div>
+                </div>
+            </div>
+            <p class="hint" id="hint">Astuce : clique sur les carbones pour les numéroter (1, 2, 3…) en suivant la
+                chaîne.</p>
+            <div id="typed" contenteditable="true" spellcheck="false"></div>
+            <button class="big" id="check" disabled>Vérifier</button>
+            <div id="acts">
+                <button class="big alt" id="share">Partager le résultat</button>
+                <button class="big" id="again">Jouer un autre aléatoire</button>
+            </div>
+        </section>
+    </main>
+    <!-- POUR AJOUTER UN COMPOSÉ : copiez un objet de "composes". nom = réponse ; atoms = {id,el,x,y} (el = "C" non affiché ; sinon Br, Cl, I, F…) ; bonds = [id1,id2,ordre 1|2|3]. Triple liaison : alignez les 4 atomes (180°). -->
+    <script id="data"
+        type="application/json">{"composes": [{"id": 1, "nom": "4-bromo-2-chloro-5-éthyl-3,3,6-triméthyloctane", "categorie": "alcane_ramifie", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -133.4, "y": 14.8}, {"id": "a1", "el": "C", "x": -97.0, "y": -6.3}, {"id": "a2", "el": "C", "x": -60.6, "y": 14.7}, {"id": "a3", "el": "C", "x": -60.6, "y": 56.7}, {"id": "a4", "el": "C", "x": -24.3, "y": -6.3}, {"id": "a5", "el": "C", "x": -24.3, "y": -48.3}, {"id": "a6", "el": "C", "x": -60.7, "y": -69.3}, {"id": "a7", "el": "C", "x": 12.1, "y": 14.6}, {"id": "a8", "el": "Br", "x": 12.2, "y": 56.6}, {"id": "a9", "el": "C", "x": 48.5, "y": -6.4}, {"id": "a10", "el": "C", "x": 27.5, "y": -42.7}, {"id": "a11", "el": "C", "x": 69.5, "y": -42.8}, {"id": "a12", "el": "C", "x": 84.9, "y": 14.6}, {"id": "a13", "el": "C", "x": 121.2, "y": -6.4}, {"id": "a14", "el": "Cl", "x": 84.9, "y": 56.6}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a2", "a4", 1], ["a4", "a5", 1], ["a5", "a6", 1], ["a4", "a7", 1], ["a7", "a8", 1], ["a7", "a9", 1], ["a9", "a10", 1], ["a9", "a11", 1], ["a9", "a12", 1], ["a12", "a13", 1], ["a12", "a14", 1]]}, {"id": 2, "nom": "3-bromo-8-chloro-4,7-diéthyl-5,6-diméthyldécane", "categorie": "alcane_ramifie", "difficulte": 5, "atoms": [{"id": "a0", "el": "C", "x": 74.5, "y": -150.6}, {"id": "a1", "el": "C", "x": 74.5, "y": -108.6}, {"id": "a2", "el": "C", "x": 38.2, "y": -87.6}, {"id": "a3", "el": "Cl", "x": 1.8, "y": -108.5}, {"id": "a4", "el": "C", "x": 38.3, "y": -45.6}, {"id": "a5", "el": "C", "x": 74.7, "y": -24.6}, {"id": "a6", "el": "C", "x": 74.8, "y": 17.3}, {"id": "a7", "el": "C", "x": 2.0, "y": -24.5}, {"id": "a8", "el": "C", "x": -34.4, "y": -45.4}, {"id": "a9", "el": "C", "x": 2.1, "y": 17.5}, {"id": "a10", "el": "C", "x": 38.5, "y": 38.4}, {"id": "a11", "el": "C", "x": -34.3, "y": 38.6}, {"id": "a12", "el": "C", "x": -70.7, "y": 17.6}, {"id": "a13", "el": "C", "x": -107.0, "y": 38.7}, {"id": "a14", "el": "C", "x": -34.2, "y": 80.6}, {"id": "a15", "el": "Br", "x": 2.2, "y": 101.5}, {"id": "a16", "el": "C", "x": -70.5, "y": 101.6}, {"id": "a17", "el": "C", "x": -70.4, "y": 143.6}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a2", "a4", 1], ["a4", "a5", 1], ["a5", "a6", 1], ["a4", "a7", 1], ["a7", "a8", 1], ["a7", "a9", 1], ["a9", "a10", 1], ["a9", "a11", 1], ["a11", "a12", 1], ["a12", "a13", 1], ["a11", "a14", 1], ["a14", "a15", 1], ["a14", "a16", 1], ["a16", "a17", 1]]}, {"id": 3, "nom": "2-bromo-4-tert-butyl-6-chloro-3,3-diméthylheptane", "categorie": "alcane_ramifie", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -115.8, "y": 28.1}, {"id": "a1", "el": "C", "x": -79.4, "y": 7.2}, {"id": "a2", "el": "Cl", "x": -79.3, "y": -34.8}, {"id": "a3", "el": "C", "x": -43.1, "y": 28.3}, {"id": "a4", "el": "C", "x": -6.6, "y": 7.4}, {"id": "a5", "el": "C", "x": -6.6, "y": -34.6}, {"id": "a6", "el": "C", "x": 35.4, "y": -34.5}, {"id": "a7", "el": "C", "x": 14.5, "y": -71.0}, {"id": "a8", "el": "C", "x": -42.9, "y": -55.7}, {"id": "a9", "el": "C", "x": 29.7, "y": 28.4}, {"id": "a10", "el": "C", "x": 8.6, "y": 64.8}, {"id": "a11", "el": "C", "x": 50.6, "y": 64.8}, {"id": "a12", "el": "C", "x": 66.1, "y": 7.5}, {"id": "a13", "el": "C", "x": 102.4, "y": 28.6}, {"id": "a14", "el": "Br", "x": 66.2, "y": -34.5}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a1", "a3", 1], ["a3", "a4", 1], ["a4", "a5", 1], ["a5", "a6", 1], ["a5", "a7", 1], ["a5", "a8", 1], ["a4", "a9", 1], ["a9", "a10", 1], ["a9", "a11", 1], ["a9", "a12", 1], ["a12", "a13", 1], ["a12", "a14", 1]]}, {"id": 4, "nom": "2-fluoro-4-iodo-5-isopropyl-7,7-diméthylnonane", "categorie": "alcane_ramifie", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": 145.5, "y": -2.0}, {"id": "a1", "el": "C", "x": 109.1, "y": -23.0}, {"id": "a2", "el": "C", "x": 72.7, "y": -2.0}, {"id": "a3", "el": "C", "x": 51.8, "y": 34.4}, {"id": "a4", "el": "C", "x": 93.8, "y": 34.4}, {"id": "a5", "el": "C", "x": 36.4, "y": -22.9}, {"id": "a6", "el": "C", "x": -0.0, "y": -1.9}, {"id": "a7", "el": "C", "x": 0.0, "y": 40.1}, {"id": "a8", "el": "C", "x": -36.3, "y": 61.1}, {"id": "a9", "el": "C", "x": 36.4, "y": 61.1}, {"id": "a10", "el": "C", "x": -36.4, "y": -22.9}, {"id": "a11", "el": "I", "x": -36.4, "y": -64.9}, {"id": "a12", "el": "C", "x": -72.7, "y": -1.9}, {"id": "a13", "el": "C", "x": -109.1, "y": -22.8}, {"id": "a14", "el": "C", "x": -145.5, "y": -1.8}, {"id": "a15", "el": "F", "x": -109.2, "y": -64.8}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a2", "a4", 1], ["a2", "a5", 1], ["a5", "a6", 1], ["a6", "a7", 1], ["a7", "a8", 1], ["a7", "a9", 1], ["a6", "a10", 1], ["a10", "a11", 1], ["a10", "a12", 1], ["a12", "a13", 1], ["a13", "a14", 1], ["a13", "a15", 1]]}, {"id": 5, "nom": "1-bromo-3-chloro-5-méthyl-2-propylcyclohexane", "categorie": "cycloalcane", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -118.1, "y": -33.7}, {"id": "a1", "el": "C", "x": -81.8, "y": -12.5}, {"id": "a2", "el": "C", "x": -45.3, "y": -33.4}, {"id": "a3", "el": "C", "x": -9.0, "y": -12.3}, {"id": "a4", "el": "C", "x": 27.4, "y": -33.2}, {"id": "a5", "el": "Cl", "x": 27.5, "y": -75.1}, {"id": "a6", "el": "C", "x": 63.7, "y": -12.0}, {"id": "a7", "el": "C", "x": 63.5, "y": 30.0}, {"id": "a8", "el": "C", "x": 99.8, "y": 51.1}, {"id": "a9", "el": "C", "x": 27.1, "y": 50.9}, {"id": "a10", "el": "C", "x": -9.2, "y": 29.7}, {"id": "a11", "el": "Br", "x": -45.6, "y": 50.6}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a3", "a4", 1], ["a4", "a5", 1], ["a4", "a6", 1], ["a6", "a7", 1], ["a7", "a8", 1], ["a7", "a9", 1], ["a9", "a10", 1], ["a10", "a11", 1], ["a10", "a3", 1]]}, {"id": 6, "nom": "2-bromo-1,1-dichloro-3-éthyl-4-méthylcyclopentane", "categorie": "cycloalcane", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -96.4, "y": -9.6}, {"id": "a1", "el": "C", "x": -60.0, "y": -30.5}, {"id": "a2", "el": "C", "x": -23.7, "y": -9.3}, {"id": "a3", "el": "C", "x": -19.5, "y": 32.4}, {"id": "a4", "el": "C", "x": -50.8, "y": 60.4}, {"id": "a5", "el": "C", "x": 21.6, "y": 41.3}, {"id": "a6", "el": "C", "x": 42.7, "y": 5.0}, {"id": "a7", "el": "Cl", "x": 71.0, "y": -26.1}, {"id": "a8", "el": "Cl", "x": 76.6, "y": 29.9}, {"id": "a9", "el": "C", "x": 14.8, "y": -26.3}, {"id": "a10", "el": "Br", "x": 23.6, "y": -67.3}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a3", "a4", 1], ["a3", "a5", 1], ["a5", "a6", 1], ["a6", "a7", 1], ["a6", "a8", 1], ["a6", "a9", 1], ["a9", "a10", 1], ["a9", "a2", 1]]}, {"id": 7, "nom": "1-chloro-5-isobutyl-2-isopropyl-1-méthylcyclooctane", "categorie": "cycloalcane", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -156.2, "y": 42.1}, {"id": "a1", "el": "C", "x": -119.9, "y": 21.1}, {"id": "a2", "el": "C", "x": -119.9, "y": -20.9}, {"id": "a3", "el": "C", "x": -83.5, "y": 42.1}, {"id": "a4", "el": "C", "x": -47.1, "y": 21.1}, {"id": "a5", "el": "C", "x": -52.6, "y": -20.5}, {"id": "a6", "el": "C", "x": -27.0, "y": -53.8}, {"id": "a7", "el": "C", "x": 14.6, "y": -59.3}, {"id": "a8", "el": "C", "x": 47.9, "y": -33.7}, {"id": "a9", "el": "C", "x": 64.0, "y": -72.6}, {"id": "a10", "el": "Cl", "x": 89.6, "y": -28.3}, {"id": "a11", "el": "C", "x": 53.4, "y": 7.9}, {"id": "a12", "el": "C", "x": 94.0, "y": 18.8}, {"id": "a13", "el": "C", "x": 104.9, "y": 59.4}, {"id": "a14", "el": "C", "x": 123.7, "y": -10.9}, {"id": "a15", "el": "C", "x": 27.9, "y": 41.2}, {"id": "a16", "el": "C", "x": -13.8, "y": 46.7}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a1", "a3", 1], ["a3", "a4", 1], ["a4", "a5", 1], ["a5", "a6", 1], ["a6", "a7", 1], ["a7", "a8", 1], ["a8", "a9", 1], ["a8", "a10", 1], ["a8", "a11", 1], ["a11", "a12", 1], ["a12", "a13", 1], ["a12", "a14", 1], ["a11", "a15", 1], ["a15", "a16", 1], ["a16", "a4", 1]]}, {"id": 8, "nom": "1-bromo-1-chloro-3-éthyl-2,2-diméthylcyclopropane", "categorie": "cycloalcane", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -86.9, "y": -12.5}, {"id": "a1", "el": "C", "x": -50.5, "y": -33.6}, {"id": "a2", "el": "C", "x": -14.1, "y": -12.8}, {"id": "a3", "el": "C", "x": 27.9, "y": -12.9}, {"id": "a4", "el": "C", "x": 67.4, "y": 1.4}, {"id": "a5", "el": "C", "x": 35.1, "y": -54.2}, {"id": "a6", "el": "C", "x": 7.0, "y": 23.6}, {"id": "a7", "el": "Cl", "x": 39.2, "y": 50.5}, {"id": "a8", "el": "Br", "x": -25.1, "y": 50.6}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a3", "a4", 1], ["a3", "a5", 1], ["a3", "a6", 1], ["a6", "a7", 1], ["a6", "a8", 1], ["a6", "a2", 1]]}, {"id": 9, "nom": "7-bromo-8-chloro-4-éthyl-3-méthyloct-3-ène", "categorie": "alcene", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": 75.6, "y": -95.2}, {"id": "a1", "el": "C", "x": 75.6, "y": -53.2}, {"id": "a2", "el": "C", "x": 39.2, "y": -32.3}, {"id": "a3", "el": "C", "x": 2.8, "y": -53.3}, {"id": "a4", "el": "C", "x": 39.2, "y": 9.7}, {"id": "a5", "el": "C", "x": 75.5, "y": 30.8}, {"id": "a6", "el": "C", "x": 111.9, "y": 9.8}, {"id": "a7", "el": "C", "x": 2.8, "y": 30.7}, {"id": "a8", "el": "C", "x": -33.6, "y": 9.7}, {"id": "a9", "el": "C", "x": -70.0, "y": 30.6}, {"id": "a10", "el": "Br", "x": -70.0, "y": 72.6}, {"id": "a11", "el": "C", "x": -106.3, "y": 9.6}, {"id": "a12", "el": "Cl", "x": -142.7, "y": 30.6}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a2", "a4", 2], ["a4", "a5", 1], ["a5", "a6", 1], ["a4", "a7", 1], ["a7", "a8", 1], ["a8", "a9", 1], ["a9", "a10", 1], ["a9", "a11", 1], ["a11", "a12", 1]]}, {"id": 10, "nom": "6-bromo-4-éthyl-8-iodo-3,3-diméthylnon-1-ène", "categorie": "alcene", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": 68.0, "y": -48.2}, {"id": "a1", "el": "C", "x": 31.6, "y": -27.3}, {"id": "a2", "el": "C", "x": -4.8, "y": -48.4}, {"id": "a3", "el": "C", "x": -25.7, "y": -84.8}, {"id": "a4", "el": "C", "x": 16.3, "y": -84.7}, {"id": "a5", "el": "C", "x": -41.2, "y": -27.4}, {"id": "a6", "el": "C", "x": -77.5, "y": -48.5}, {"id": "a7", "el": "C", "x": -77.4, "y": -90.5}, {"id": "a8", "el": "C", "x": -41.3, "y": 14.6}, {"id": "a9", "el": "C", "x": -4.9, "y": 35.6}, {"id": "a10", "el": "Br", "x": 31.5, "y": 14.7}, {"id": "a11", "el": "C", "x": -5.0, "y": 77.6}, {"id": "a12", "el": "C", "x": 31.3, "y": 98.7}, {"id": "a13", "el": "C", "x": 31.2, "y": 140.7}, {"id": "a14", "el": "I", "x": 67.7, "y": 77.8}], "bonds": [["a0", "a1", 2], ["a1", "a2", 1], ["a2", "a3", 1], ["a2", "a4", 1], ["a2", "a5", 1], ["a5", "a6", 1], ["a6", "a7", 1], ["a5", "a8", 1], ["a8", "a9", 1], ["a9", "a10", 1], ["a9", "a11", 1], ["a11", "a12", 1], ["a12", "a13", 1], ["a12", "a14", 1]]}, {"id": 11, "nom": "2-bromo-5-chloro-3,4-diméthylhexa-2,4-diène", "categorie": "diene", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -54.6, "y": 52.5}, {"id": "a1", "el": "C", "x": -54.6, "y": 10.5}, {"id": "a2", "el": "Cl", "x": -90.9, "y": -10.6}, {"id": "a3", "el": "C", "x": -18.2, "y": -10.5}, {"id": "a4", "el": "C", "x": -18.1, "y": -52.5}, {"id": "a5", "el": "C", "x": 18.2, "y": 10.5}, {"id": "a6", "el": "C", "x": 18.1, "y": 52.5}, {"id": "a7", "el": "C", "x": 54.6, "y": -10.5}, {"id": "a8", "el": "C", "x": 54.6, "y": -52.5}, {"id": "a9", "el": "Br", "x": 90.9, "y": 10.6}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a1", "a3", 2], ["a3", "a4", 1], ["a3", "a5", 1], ["a5", "a6", 1], ["a5", "a7", 2], ["a7", "a8", 1], ["a7", "a9", 1]]}, {"id": 12, "nom": "4-bromo-3-chloro-2,3-diméthylhexa-1,5-diène", "categorie": "diene", "difficulte": 4, "atoms": [{"id": "a0", "el": "C", "x": -98.2, "y": -9.5}, {"id": "a1", "el": "C", "x": -61.8, "y": 11.6}, {"id": "a2", "el": "C", "x": -25.5, "y": -9.4}, {"id": "a3", "el": "Br", "x": -25.4, "y": -51.4}, {"id": "a4", "el": "C", "x": 10.9, "y": 11.6}, {"id": "a5", "el": "C", "x": 31.9, "y": 48.0}, {"id": "a6", "el": "Cl", "x": -10.1, "y": 48.0}, {"id": "a7", "el": "C", "x": 47.3, "y": -9.3}, {"id": "a8", "el": "C", "x": 47.3, "y": -51.3}, {"id": "a9", "el": "C", "x": 83.6, "y": 11.7}], "bonds": [["a0", "a1", 2], ["a1", "a2", 1], ["a2", "a3", 1], ["a2", "a4", 1], ["a4", "a5", 1], ["a4", "a6", 1], ["a4", "a7", 1], ["a7", "a8", 2], ["a7", "a9", 1]]}, {"id": 13, "nom": "2-bromo-1-chloro-3-éthyl-4-isopropyl-6-méthylcyclohex-1-ène", "categorie": "cycloalcene", "difficulte": 5, "atoms": [{"id": "a0", "el": "C", "x": 88.3, "y": 20.9}, {"id": "a1", "el": "C", "x": 52.0, "y": 42.0}, {"id": "a2", "el": "C", "x": 15.6, "y": 21.0}, {"id": "a3", "el": "C", "x": -20.8, "y": 42.0}, {"id": "a4", "el": "Br", "x": -20.7, "y": 84.0}, {"id": "a5", "el": "C", "x": -57.1, "y": 21.0}, {"id": "a6", "el": "Cl", "x": -93.5, "y": 42.1}, {"id": "a7", "el": "C", "x": -57.2, "y": -21.0}, {"id": "a8", "el": "C", "x": -93.6, "y": -41.9}, {"id": "a9", "el": "C", "x": -20.8, "y": -42.0}, {"id": "a10", "el": "C", "x": 15.6, "y": -21.0}, {"id": "a11", "el": "C", "x": 51.9, "y": -42.0}, {"id": "a12", "el": "C", "x": 88.3, "y": -21.1}, {"id": "a13", "el": "C", "x": 51.9, "y": -84.0}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a3", "a4", 1], ["a3", "a5", 2], ["a5", "a6", 1], ["a5", "a7", 1], ["a7", "a8", 1], ["a7", "a9", 1], ["a9", "a10", 1], ["a10", "a11", 1], ["a11", "a12", 1], ["a11", "a13", 1], ["a10", "a2", 1]]}, {"id": 14, "nom": "1-bromo-4-(2-chloro-4-méthylpentan-3-yl)-2-méthylcyclohexane", "categorie": "cycloalcane_substituant_complexe", "difficulte": 5, "atoms": [{"id": "a0", "el": "C", "x": 106.7, "y": 25.1}, {"id": "a1", "el": "C", "x": 70.3, "y": 4.1}, {"id": "a2", "el": "C", "x": 70.3, "y": -37.9}, {"id": "a3", "el": "C", "x": 34.0, "y": 25.2}, {"id": "a4", "el": "C", "x": 34.0, "y": 67.2}, {"id": "a5", "el": "C", "x": 70.4, "y": 88.1}, {"id": "a6", "el": "Cl", "x": -2.4, "y": 88.2}, {"id": "a7", "el": "C", "x": -2.4, "y": 4.2}, {"id": "a8", "el": "C", "x": -38.8, "y": 25.2}, {"id": "a9", "el": "C", "x": -75.2, "y": 4.3}, {"id": "a10", "el": "C", "x": -75.2, "y": -37.7}, {"id": "a11", "el": "Br", "x": -111.6, "y": -58.7}, {"id": "a12", "el": "C", "x": -38.8, "y": -58.8}, {"id": "a13", "el": "C", "x": -38.9, "y": -100.8}, {"id": "a14", "el": "C", "x": -2.5, "y": -37.8}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a1", "a3", 1], ["a3", "a4", 1], ["a4", "a5", 1], ["a4", "a6", 1], ["a3", "a7", 1], ["a7", "a8", 1], ["a8", "a9", 1], ["a9", "a10", 1], ["a10", "a11", 1], ["a10", "a12", 1], ["a12", "a13", 1], ["a12", "a14", 1], ["a14", "a7", 1]]}, {"id": 15, "nom": "1-(5-bromo-2,2,6-triméthylheptan-3-yl)-3-méthylcyclopentane", "categorie": "cycloalcane_substituant_complexe", "difficulte": 5, "atoms": [{"id": "a0", "el": "C", "x": -146.9, "y": 26.9}, {"id": "a1", "el": "C", "x": -105.1, "y": 31.3}, {"id": "a2", "el": "C", "x": -84.1, "y": 67.7}, {"id": "a3", "el": "C", "x": -43.0, "y": 59.0}, {"id": "a4", "el": "C", "x": -38.6, "y": 17.3}, {"id": "a5", "el": "C", "x": -2.2, "y": -3.7}, {"id": "a6", "el": "C", "x": 34.1, "y": 17.4}, {"id": "a7", "el": "C", "x": 70.5, "y": -3.6}, {"id": "a8", "el": "Br", "x": 70.6, "y": -45.6}, {"id": "a9", "el": "C", "x": 106.9, "y": 17.4}, {"id": "a10", "el": "C", "x": 143.3, "y": -3.5}, {"id": "a11", "el": "C", "x": 106.8, "y": 59.4}, {"id": "a12", "el": "C", "x": -2.2, "y": -45.7}, {"id": "a13", "el": "C", "x": -44.2, "y": -45.7}, {"id": "a14", "el": "C", "x": -23.1, "y": -82.1}, {"id": "a15", "el": "C", "x": 34.2, "y": -66.6}, {"id": "a16", "el": "C", "x": -77.0, "y": 0.1}], "bonds": [["a0", "a1", 1], ["a1", "a2", 1], ["a2", "a3", 1], ["a3", "a4", 1], ["a4", "a5", 1], ["a5", "a6", 1], ["a6", "a7", 1], ["a7", "a8", 1], ["a7", "a9", 1], ["a9", "a10", 1], ["a9", "a11", 1], ["a5", "a12", 1], ["a12", "a13", 1], ["a12", "a14", 1], ["a12", "a15", 1], ["a4", "a16", 1], ["a16", "a1", 1]]}]}</script>
+    <script>
+        const D = JSON.parse(document.getElementById('data').textContent).composes, $ = id => document.getElementById(id);
+        D.forEach(c => { c.adj = {}; c.atoms.forEach(a => c.adj[a.id] = []); c.bonds.forEach(([i, j]) => { c.adj[i].push(j); c.adj[j].push(i) }) });
+        const CAT = { alcane_ramifie: 'Alcane', cycloalcane: 'Cycloalcane', alcene: 'Alcène', diene: 'Diène', cycloalcene: 'Cycloalcène', cycloalcane_substituant_complexe: 'Cycle + substituant' };
+        const COL = { O: '#e03131', N: '#1c7ed6', Cl: '#2f9e44', Br: '#8d5524', F: '#f06595', I: '#7048e8', S: '#e0a800' };
+        let done = {}; try { done = JSON.parse(localStorage.getItem('iupac_done') || '{}') } catch (e) { }
+        function svg(c, nums = [], act = false) {
+            const M = {}; c.atoms.forEach(a => M[a.id] = a); const xs = c.atoms.map(a => a.x), ys = c.atoms.map(a => a.y), p = 52, x0 = Math.min(...xs) - p, y0 = Math.min(...ys) - p, w = Math.max(...xs) - x0 + p, h = Math.max(...ys) - y0 + p;
+            const ch = new Set(); for (let i = 1; i < nums.length; i++) { ch.add(nums[i - 1] + '|' + nums[i]); ch.add(nums[i] + '|' + nums[i - 1]) }
+            const R = a => a.el != 'C' ? 11 : 0; let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}" fill="none" stroke-linecap="round">`;
+            c.bonds.forEach(([i, j, o]) => {
+                const A = M[i], B = M[j], dx = B.x - A.x, dy = B.y - A.y, l = Math.hypot(dx, dy), nx = -dy / l, ny = dx / l, t1 = R(A), t2 = l - R(B), g = ch.has(i + '|' + j), col = g ? '#58CC02' : '#23262d', sw = 2.4;
+                (o == 1 ? [0] : o == 2 ? [-2.6, 2.6] : [-5, 0, 5]).forEach(k => { s += `<path d="M${A.x + dx / l * t1 + nx * k} ${A.y + dy / l * t1 + ny * k}L${A.x + dx / l * t2 + nx * k} ${A.y + dy / l * t2 + ny * k}" stroke="${col}" stroke-width="${sw}"/>` })
+            });
+            const bp = id => {
+                const a = M[id], T = c.adj[id].map(n => Math.atan2(M[n].y - a.y, M[n].x - a.x)); let best = 0, bs = -1;
+                for (let d = 0; d < 360; d += 10) { const r = d * Math.PI / 180; let m = 9; T.forEach(t => { let q = Math.abs(r - t) % (2 * Math.PI); q = Math.min(q, 2 * Math.PI - q); m = Math.min(m, q) }); if (m > bs + 1e-9) { bs = m; best = r } }
+                return [a.x + Math.cos(best) * 24, a.y + Math.sin(best) * 24]
+            };
+            c.atoms.forEach(a => {
+                if (a.el == 'C') { const on = nums.includes(a.id); s += `<circle cx="${a.x}" cy="${a.y}" r="5.5" fill="${on ? '#58CC02' : 'transparent'}" stroke="none"/>`; if (act) s += `<circle data-a="${a.id}" cx="${a.x}" cy="${a.y}" r="13" stroke="none"/>` }
+                else s += `<circle cx="${a.x}" cy="${a.y}" r="11" fill="${COL[a.el] || '#868e96'}" stroke="none"/><text x="${a.x}" y="${a.y + 4.6}" text-anchor="middle" font-size="13" font-weight="800" font-family="Arial,sans-serif" fill="#fff" stroke="none">${a.el}</text>`
+            });
+            nums.forEach((id, i) => { const q = bp(id); s += `<text x="${q[0]}" y="${q[1] + 4}" text-anchor="middle" font-size="12" font-weight="800" font-family="Arial,sans-serif" fill="#2f9e44" stroke="none">${i + 1}</text>` });
+            return s + '</svg>'
+        }
+        function build() { $('list').innerHTML = D.map((c, i) => `<div class="card ${done[c.id] ? 'done' : ''}" data-i="${i}">${svg(c)}<div><b>Composé n°${c.id}</b>${CAT[c.categorie] || c.categorie}<br>${'★'.repeat(c.difficulte)}${'☆'.repeat(5 - c.difficulte)}</div>${done[c.id] ? `<span class="star">★ ${done[c.id]}%</span>` : ''}</div>`).join(''); document.querySelectorAll('.card').forEach(e => e.onclick = () => start(+e.dataset.i)) }
+        build(); $('menuBtn').onclick = () => $('side').classList.toggle('open');
+        function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id == id)) }
+        let cur, t0, tm, val = '', nums = [], locked = false, last, isPaused = false, pausedMs = 0;
+        function start(i) { cur = D[i]; $('side').classList.remove('open'); $('timer').style.display = 'none'; show('sCount'); let n = 3; const tick = () => { if (n == 0) return go(); $('count').textContent = n; $('count').style.animation = 'none'; void $('count').offsetWidth; $('count').style.animation = ''; n--; setTimeout(tick, 950) }; tick() }
+        function go() { show('sPlay'); $('sPlay').classList.remove('res'); locked = false; nums = []; val = ''; isPaused = false; pausedMs = 0; $('typed').contentEditable = true; $('typed').textContent = ''; $('hint').style.visibility = 'visible'; $('draw').classList.remove('glass'); $('stopBtn').style.display = 'block'; $('stopBtn').textContent = '⏸ Stop'; $('stopBtn').disabled = false; draw(); render(); $('timer').style.display = 'block'; t0 = Date.now(); clearInterval(tm); tm = setInterval(() => { if (!isPaused) $('timer').textContent = fmt(Date.now() - t0) }, 100); $('typed').focus() }
+        const draw = () => $('draw').innerHTML = svg(cur, nums, !locked);
+        $('draw').onclick = e => {
+            if (isPaused) return; const g = e.target.closest('[data-a]'); if (!g || locked) return; const id = g.dataset.a, i = nums.indexOf(id);
+            if (i >= 0) { nums = nums.slice(0, i); } else if (!nums.length || cur.adj[nums[nums.length - 1]].includes(id)) nums.push(id); draw()
+        };
+        const fmt = ms => { const s = ms / 1000; return Math.floor(s / 60) + ':' + (s % 60).toFixed(1).padStart(4, '0') };
+        function fit(T, max) { let f = max; T.style.fontSize = f + 'px'; while (T.scrollWidth > T.clientWidth && f > 11) { f -= 2; T.style.fontSize = f + 'px' } }
+        const esc = s => s.replace(/</g, '&lt;');
+        function render() { fit($('typed'), 44); $('check').disabled = val.trim().length < 3 }
+        $('typed').addEventListener('input', e => { val = e.target.textContent || ''; render() });
+        $('typed').addEventListener('keydown', e => { if (e.key == 'Enter') { e.preventDefault(); if (!$('check').disabled && !locked) verify() } });
+        $('typed').addEventListener('paste', e => { e.preventDefault() });
+        $('typed').addEventListener('drop', e => { e.preventDefault() });
+        $('check').onclick = verify;
+        const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        function diff(user, corr) {
+            const u = [...user.trim()].map((c, i, a) => ({ c, ig: c == ' ' && (/[-,]/.test(a[i - 1] || '') || /[-,]/.test(a[i + 1] || '')) })); const U = u.map((x, i) => i).filter(i => !u[i].ig), C = [...corr], n = U.length, m = C.length;
+            const L = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0)), eq = (i, j) => fold(u[U[i]].c) == fold(C[j]);
+            for (let i = n - 1; i >= 0; i--)for (let j = m - 1; j >= 0; j--)L[i][j] = eq(i, j) ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+            const ops = []; let i = 0, j = 0; while (i < n || j < m) { if (i < n && j < m && eq(i, j)) { ops.push({ t: 'g', c: u[U[i]].c, ui: U[i] }); i++; j++ } else if (j < m && (i >= n || L[i][j + 1] >= L[i + 1][j])) { ops.push({ t: 'm', c: C[j] }); j++ } else { ops.push({ t: 'x', c: u[U[i]].c, ui: U[i] }); i++ } }
+            let html = '', e = 0; const flush = k => { while (e < k) { if (u[e].ig) html += `<span class="n">${u[e].c}</span>`; e++ } };
+            ops.forEach(o => { if (o.ui != null) { flush(o.ui); e = o.ui + 1 } html += `<span class="${o.t}">${esc(o.c == ' ' ? '␣' : o.c)}</span>` }); flush(u.length);
+            const match = L[0][0], runs = ops.filter((o, k) => o.t == 'g' && (k == 0 || ops[k - 1].t != 'g')).length, pct = Math.round(100 * match / Math.max(n, m));
+            const far = n < 3 || pct < 45 || n < m * .3 || n > m * 2.5 || (pct < 75 && runs * 3 > match); return { html, pct, ops, far }
+        }
+        function groups(ops, t) { const r = []; let s = ''; ops.forEach(o => { if (o.t == t) s += o.c; else if (s) { r.push(s); s = '' } }); if (s) r.push(s); return r }
+        function verify() {
+            clearInterval(tm); locked = true; $('typed').contentEditable = false; $('stopBtn').style.display = 'none'; const ms = isPaused ? pausedMs : Date.now() - t0, d = diff(val, cur.nom); nums = []; draw(); $('hint').style.visibility = 'hidden';
+            const win = !d.far && d.pct > 97;
+            $('typed').innerHTML = d.far ? `<span class="m">${esc(cur.nom)}</span>` : d.html; fit($('typed'), 44);
+            $('pct').textContent = d.pct + ' %'; $('pct').className = 'pct ' + (win ? 'win' : d.pct < 50 ? 'lose' : ''); $('banner').style.display = win ? 'block' : 'none'; $('time').innerHTML = '⏱ Temps : <b>' + fmt(ms) + '</b>';
+            const mi = d.far ? [] : groups(d.ops, 'm'), ex = d.far ? [] : groups(d.ops, 'x');
+            $('learn').innerHTML = `<p>Ta réponse : <code>${esc(val)}</code><br>Réponse correcte : <code class="g">${esc(cur.nom)}</code></p>` +
+                (d.far ? '<p><span class="m">Réponse trop éloignée</span> : elle est comptée comme entièrement fausse. La bonne réponse est affichée en rouge sous le dessin.</p>' : '') +
+                (mi.length ? `<p>Tu as oublié : ${mi.map(x => `<span class="m">« ${esc(x)} »</span>`).join(' ')}</p>` : '') + (ex.length ? `<p>En trop ou erroné : ${ex.map(x => `<span class="x">« ${esc(x)} »</span>`).join(' ')}</p>` : '') +
+                (win ? '<p>🎉 Parfait, tu maîtrises ce nom !</p>' : '');
+            const sc = d.far ? 0 : d.pct; if ((done[cur.id] || 0) < sc) { done[cur.id] = sc; try { localStorage.setItem('iupac_done', JSON.stringify(done)) } catch (e) { } build() }
+            last = { pct: d.pct, ms, win }; $('sPlay').classList.add('res'); setTimeout(() => fit($('typed'), 44), 650)
+        }
+        $('stopBtn').onclick = () => {
+            if (locked) return;
+            if (isPaused) {
+                isPaused = false;
+                t0 = Date.now() - pausedMs;
+                $('draw').classList.remove('glass');
+                $('typed').contentEditable = true;
+                $('typed').focus();
+                $('stopBtn').textContent = '⏸ Stop';
+            } else {
+                isPaused = true;
+                pausedMs = Date.now() - t0;
+                $('draw').classList.add('glass');
+                $('typed').contentEditable = false;
+                $('stopBtn').textContent = '▶ Reprendre';
+            }
+        };
+        $('rand').onclick = $('again').onclick = () => start(Math.floor(Math.random() * D.length));
+        $('share').onclick = () => {
+            const cv = document.createElement('canvas'); cv.width = 1000; cv.height = 620; const g = cv.getContext('2d'), F = 'Nunito,Segoe UI,sans-serif'; g.fillStyle = '#faf8f3'; g.fillRect(0, 0, 1000, 620);
+            g.fillStyle = '#23262d'; g.font = '800 44px ' + F; g.fillText('Nomme-moi ! — IUPAC', 40, 70); g.font = '800 120px ' + F; g.fillStyle = last.win ? '#1f9d55' : '#d62839'; g.fillText(last.pct + ' %', 40, 420);
+            g.fillStyle = '#23262d'; g.font = '600 36px ' + F; g.fillText('Temps : ' + fmt(last.ms), 40, 490); g.fillText(cur.nom.length > 38 ? cur.nom.slice(0, 38) + '…' : cur.nom, 40, 560);
+            const im = new Image(); im.onload = () => { g.drawImage(im, 430, 100, 540, 400); cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'resultat-iupac.png'; a.click() }) };
+            im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg(cur, nums))
+        };
+    </script>
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault()); // block right-click
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('cut', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+    </script>
+</body>
+
+</html>
