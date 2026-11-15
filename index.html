@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
     <title>IUPAC — Nomme-moi</title>
 
     <link
@@ -33,6 +34,11 @@
         }
 
         body {
+            height: 100dvh;
+            touch-action: manipulation
+        }
+
+        body {
             font-family: var(--f);
             color: var(--ink);
             background-color: var(--bg);
@@ -59,11 +65,7 @@
             font-size: 20px
         }
 
-        @media(max-width:899px) {
-            #warn {
-                display: flex
-            }
-        }
+
 
         #menuBtn {
             position: fixed;
@@ -285,6 +287,10 @@
             max-width: 100%
         }
 
+        #draw {
+            -webkit-touch-callout: none
+        }
+
         circle[data-a] {
             fill: transparent;
             cursor: pointer
@@ -462,21 +468,342 @@
             color: var(--warn);
             font-weight: 700
         }
+
+        #backdrop {
+            display: none
+        }
+
+        #numCtl {
+            display: none
+        }
+
+        /* ===== MOBILE (≤ 899px) ===== */
+        @media(max-width:899px) {
+            #topbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 30;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
+                background: var(--bg);
+                border-bottom: 2px solid var(--line)
+            }
+
+            #topbar>* {
+                position: static
+            }
+
+            #menuBtn {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+                border-radius: 12px
+            }
+
+            #timer {
+                margin-left: auto;
+                font-size: 16px;
+                padding: 4px 8px
+            }
+
+            #stopBtn,
+            #hintBtn {
+                font-size: 13px;
+                padding: 8px;
+                min-height: 44px;
+                white-space: nowrap
+            }
+
+            #side {
+                width: min(360px, 85vw);
+                z-index: 25;
+                padding-top: calc(76px + env(safe-area-inset-top));
+                padding-bottom: calc(18px + env(safe-area-inset-bottom))
+            }
+
+            #backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 22;
+                background: rgba(35, 38, 45, .35)
+            }
+
+            #side.open+#backdrop {
+                display: block
+            }
+
+            .card:hover {
+                transform: none
+            }
+
+            .card:active {
+                transform: scale(.97)
+            }
+
+            main {
+                padding-top: calc(64px + env(safe-area-inset-top));
+                padding-bottom: env(safe-area-inset-bottom)
+            }
+
+            .screen {
+                padding: 12px
+            }
+
+            h1 {
+                font-size: clamp(34px, 10vw, 52px)
+            }
+
+            #count {
+                font-size: clamp(120px, 34vw, 180px)
+            }
+
+            #sPlay.on {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: var(--acc) transparent
+            }
+
+            #stage {
+                display: contents
+            }
+
+            #draw {
+                order: 1;
+                flex: none;
+                width: 100%;
+                height: clamp(180px, 38dvh, 340px);
+                min-height: 180px;
+                transition: none
+            }
+
+            #draw svg {
+                width: 100%;
+                height: 100%
+            }
+
+            #hint {
+                order: 2;
+                margin: 6px 0 0
+            }
+
+            #typed {
+                order: 3;
+                width: 100%;
+                min-height: 56px;
+                margin: 10px 0;
+                padding: 8px 2px;
+                font-size: 16px;
+                line-height: 1.4;
+                white-space: normal;
+                overflow-wrap: anywhere;
+                overflow: visible
+            }
+
+            #check {
+                order: 4;
+                width: 100%;
+                padding: 14px;
+                font-size: 18px
+            }
+
+            #card {
+                order: 5;
+                flex: none;
+                width: 100%;
+                height: auto;
+                max-height: 0;
+                margin: 0;
+                padding: 0 16px;
+                border-width: 0;
+                opacity: 0;
+                overflow: hidden;
+                transform: translateY(24px);
+                transition: max-height .5s, opacity .4s, transform .5s, padding .5s, margin .5s
+            }
+
+            .res #card {
+                max-height: none;
+                margin: 12px 0;
+                padding: 16px;
+                border-width: 2px;
+                opacity: 1;
+                overflow: visible;
+                transform: none;
+                box-shadow: 4px 4px 0 var(--ink)
+            }
+
+            .res #draw {
+                flex: none;
+                height: clamp(140px, 26dvh, 240px);
+                min-height: 140px
+            }
+
+            .res #hint {
+                display: none
+            }
+
+            #acts {
+                order: 6;
+                flex-direction: column;
+                margin: 4px 0 24px
+            }
+
+            #acts .big {
+                width: 100%;
+                padding: 14px;
+                font-size: 17px
+            }
+
+            .pct {
+                font-size: 48px
+            }
+
+            #banner {
+                font-size: 22px
+            }
+
+            #learn {
+                font-size: 15px
+            }
+
+            #sPlay.on {
+                justify-content: center
+            }
+
+            #sPlay.on.res {
+                justify-content: flex-start
+            }
+
+            #typed {
+                flex: none;
+                word-break: break-word
+            }
+
+            #check {
+                flex: none
+            }
+
+            #card {
+                display: none
+            }
+
+            .res #card {
+                display: block;
+                animation: rise .45s ease
+            }
+
+            @keyframes rise {
+                from {
+                    opacity: 0;
+                    transform: translateY(24px)
+                }
+
+                to {
+                    opacity: 1;
+                    transform: none
+                }
+            }
+
+            main {
+                height: calc(100% - var(--kb, 0px))
+            }
+
+            body.kb-open #hint {
+                display: none
+            }
+
+            body.kb-open #draw {
+                flex: none;
+                height: 110px;
+                min-height: 0;
+                max-height: none
+            }
+
+            body.kb-open #sPlay.on {
+                justify-content: flex-start
+            }
+
+            #numCtl {
+                order: 2;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                margin: 2px 0 6px
+            }
+
+            #sPlay.on:not(.res) #numCtl {
+                display: flex
+            }
+
+            #chainInfo {
+                font: 700 14px var(--f);
+                color: #555
+            }
+
+            #chainInfo b {
+                color: var(--acc)
+            }
+
+            #hint {
+                order: 3
+            }
+
+            #typed {
+                order: 4
+            }
+
+            #check {
+                order: 5
+            }
+
+            #card {
+                order: 6
+            }
+
+            #acts {
+                order: 7
+            }
+
+            #sPlay.on.res {
+                height: auto;
+                max-height: 100%;
+                justify-content: flex-start
+            }
+
+            .res #draw {
+                height: clamp(110px, 20dvh, 180px);
+                min-height: 0
+            }
+
+            .res #card {
+                margin: 10px 0;
+                padding: 14px 16px
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div id="warn">
-        <div>📵<br>Ce site est conçu pour les ordinateurs.<br>Ouvrez-le sur un écran plus large (≥ 900 px).</div>
+
+    <div id="topbar">
+        <button id="menuBtn" title="Composés">☰</button>
+        <div id="timer" style="display:none">0:00.0</div>
+        <button id="stopBtn" style="display:none">⏸ Stop</button>
+        <button id="hintBtn" style="display:none">💡 Hint</button>
     </div>
-    <button id="menuBtn" title="Composés">☰</button>
     <aside id="side">
         <h2>Composés</h2><small>Cliquez sur une carte pour jouer ce composé</small>
         <div id="list"></div>
     </aside>
-    <div id="timer" style="display:none">0:00.0</div>
-    <button id="stopBtn" style="display:none">⏸ Stop</button>
-    <button id="hintBtn" style="display:none">💡 Hint</button>
+    <div id="backdrop"></div>
     <main>
         <section class="screen on" id="sHome">
             <h1>Nomme-moi ! ⚗️</h1>
@@ -496,6 +823,7 @@
                     <div id="learn"></div>
                 </div>
             </div>
+
             <p class="hint" id="hint">Astuce : clique sur les carbones pour les numéroter (1, 2, 3…) en suivant la
                 chaîne.</p>
             <div id="typed" contenteditable="true" spellcheck="false"></div>
@@ -894,6 +1222,15 @@
                 ch.add(nums[i] + '|' + nums[i - 1]);
             }
             var R = function (a) { return a.el != 'C' ? 11 : 0; };
+            if (act) {
+                if (window.matchMedia('(max-width:899px)').matches) {
+                    var bx = $('draw');
+                    var sc = Math.min((bx.clientWidth || 320) / w, (bx.clientHeight || 220) / h);
+                    HIT = Math.max(14, Math.min(22 / sc, 40));
+                } else {
+                    HIT = 13;
+                }
+            }
             var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + x0 + ' ' + y0 + ' ' + w + ' ' + h + '" fill="none" stroke-linecap="round">';
             c.bonds.forEach(function (b) {
                 var i = b[0], j = b[1], o = b[2];
@@ -935,7 +1272,7 @@
                     var on = nums.indexOf(a.id) >= 0;
                     s += '<circle cx="' + a.x + '" cy="' + a.y + '" r="5.5" fill="' + (on ? '#58CC02' : 'transparent') + '" stroke="none"/>';
                     if (act) {
-                        s += '<circle data-a="' + a.id + '" cx="' + a.x + '" cy="' + a.y + '" r="13" stroke="none"/>';
+                        s += '<circle data-a="' + a.id + '" cx="' + a.x + '" cy="' + a.y + '" r="' + HIT + '" stroke="none"/>';
                     }
                 } else {
                     var cc = COL[a.el] || '#868e96';
@@ -967,6 +1304,7 @@
         build();
 
         $('menuBtn').onclick = function () { $('side').classList.toggle('open'); };
+        $('backdrop').onclick = function () { $('side').classList.remove('open'); };
 
         function show(id) {
             document.querySelectorAll('.screen').forEach(function (s) {
@@ -975,6 +1313,7 @@
         }
 
         var cur, t0, tm, val = '', nums = [], locked = false, last, isPaused = false, pausedMs = 0;
+        var HIT = 13;
         var hintUsed = false;
         function start(i) {
             cur = D[i];
@@ -1026,21 +1365,38 @@
             $('typed').focus();
         }
 
-        function draw() { $('draw').innerHTML = svg(cur, nums, !locked); }
+        function draw() {
+            $('draw').innerHTML = svg(cur, nums, !locked);
+
+        }
 
         $('draw').onclick = function (e) {
-            if (isPaused) return;
-            var g = e.target.closest('[data-a]');
-            if (!g || locked) return;
-            var id = g.dataset.a;
-            var i = nums.indexOf(id);
+            if (isPaused || locked) return;
+            var svgEl = $('draw').querySelector('svg');
+            if (!svgEl || !svgEl.getScreenCTM) return;
+            var m = svgEl.getScreenCTM();
+            if (!m) return;
+            var pt = svgEl.createSVGPoint();
+            pt.x = e.clientX;
+            pt.y = e.clientY;
+            var loc = pt.matrixTransform(m.inverse());
+            var best = null, bd = Infinity;
+            cur.atoms.forEach(function (a) {
+                if (a.el !== 'C') return;
+                var d = Math.hypot(a.x - loc.x, a.y - loc.y);
+                if (d < bd) { bd = d; best = a.id; }
+            });
+            if (best === null || bd > HIT) return;
+            var i = nums.indexOf(best);
             if (i >= 0) {
                 nums = nums.slice(0, i);
-            } else if (!nums.length || cur.adj[nums[nums.length - 1]].indexOf(id) >= 0) {
-                nums.push(id);
+            } else if (!nums.length || cur.adj[nums[nums.length - 1]].indexOf(best) >= 0) {
+                nums.push(best);
             }
             draw();
         };
+
+
 
         function fmt(ms) {
             var s = ms / 1000;
@@ -1048,6 +1404,10 @@
         }
 
         function fit(T, max) {
+            if (window.matchMedia('(max-width:899px)').matches) {
+                T.style.fontSize = '16px';
+                return;
+            }
             var f = max;
             T.style.fontSize = f + 'px';
             while (T.scrollWidth > T.clientWidth && f > 11) {
@@ -1147,6 +1507,7 @@
         function verify() {
             clearInterval(tm);
             locked = true;
+            $('typed').blur();
             $('typed').contentEditable = false;
             $('stopBtn').style.display = 'none';
             $('hintBtn').style.display = 'none';
@@ -1205,8 +1566,10 @@
                 pausedMs = Date.now() - t0;
                 $('draw').classList.add('glass');
                 $('typed').contentEditable = false;
+                $('typed').blur();
                 $('stopBtn').textContent = '▶ Reprendre';
             }
+            draw();
         };
         $('hintBtn').onclick = function () {
             if (locked || isPaused || hintUsed) return;
@@ -1233,6 +1596,25 @@
             render();
             $('typed').focus();
         };
+
+        function syncKB() {
+            var vv = window.visualViewport;
+            var kb = 0;
+            if (vv) kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+            document.documentElement.style.setProperty('--kb', kb + 'px');
+            document.body.classList.toggle('kb-open', kb > 80);
+            if (kb > 80 && !locked && $('sPlay').classList.contains('on')) {
+                setTimeout(function () { $('typed').scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 60);
+            }
+        }
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', syncKB);
+            window.visualViewport.addEventListener('scroll', syncKB);
+        }
+        window.addEventListener('resize', syncKB);
+        $('typed').addEventListener('focus', function () { setTimeout(syncKB, 250); });
+        $('typed').addEventListener('blur', function () { setTimeout(syncKB, 120); });
+        syncKB();
 
         $('rand').onclick = function () { start(Math.floor(Math.random() * D.length)); };
         $('again').onclick = function () { start(Math.floor(Math.random() * D.length)); };
