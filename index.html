@@ -909,19 +909,56 @@
 {"id": "a6", "el": "C", "x": -44.4, "y": 21.0},
 {"id": "a7", "el": "C", "x": -80.8, "y": 0.1},
 {"id": "a8", "el": "Br", "x": -117.2, "y": 21.1}], "bonds": [["a0", "a1", 1], ["a1", "a2", 2], ["a1", "a3", 1], ["a3", "a4", 2], ["a4", "a5", 1], ["a4", "a6", 1], ["a6", "a7", 1], ["a7", "a8", 1]]},
-{"id": 23, "nom": "acide 4-carbamoyl-3-méthylhexanoïque", "nom_en": "4-carbamoyl-3-methylhexanoic acid", "categorie": "examen_mixte", "sections": ["acides_carboxyliques", "amides_nitriles", "prefixes_dechus", "duel_suffixe_prefixe"], "difficulte": 5, "structure": {"smiles": "CCC(C(N)=O)C(C)CC(=O)O", "formule_brute": "C8H15NO3"}, "groupe_principal": "acide carboxylique", "prefixes_declasses": ["carbamoyl"], "raisonnement": "Acide > amide : l'amide devient le préfixe « carbamoyl » (son carbone n'est pas dans la chaîne) ; chaîne principale de 6 C contenant le COOH.", "atoms": [
-{"id": "a0", "el": "O", "x": -112.1, "y": 12.5},
-{"id": "a1", "el": "C", "x": -75.8, "y": -8.6},
-{"id": "a2", "el": "O", "x": -75.9, "y": -50.6},
-{"id": "a3", "el": "C", "x": -39.4, "y": 12.3},
-{"id": "a4", "el": "C", "x": -3.0, "y": -8.7},
-{"id": "a5", "el": "C", "x": -3.1, "y": -50.7},
-{"id": "a6", "el": "C", "x": 33.4, "y": 12.2},
-{"id": "a7", "el": "C", "x": 69.7, "y": -8.9},
-{"id": "a8", "el": "N", "x": 106.1, "y": 12.0},
-{"id": "a9", "el": "O", "x": 69.6, "y": -50.9},
-{"id": "a10", "el": "C", "x": 33.5, "y": 54.2},
-{"id": "a11", "el": "C", "x": -2.9, "y": 75.3}], "bonds": [["a0", "a1", 1], ["a1", "a2", 2], ["a1", "a3", 1], ["a3", "a4", 1], ["a4", "a5", 1], ["a4", "a6", 1], ["a6", "a7", 1], ["a7", "a8", 1], ["a7", "a9", 2], ["a6", "a10", 1], ["a10", "a11", 1]]},
+{
+  "id": 23,
+  "nom": "acide 5-amino-4-éthyl-3-méthyl-5-oxopentanoïque",
+  "nom_en": "5-amino-4-ethyl-3-methyl-5-oxopentanoic acid",
+  "categorie": "examen_mixte",
+  "sections": [
+    "acides_carboxyliques",
+    "amides_nitriles",
+    "prefixes_dechus",
+    "duel_suffixe_prefixe"
+  ],
+  "difficulte": 5,
+  "structure": {
+    "smiles": "CCC(C(N)=O)C(C)CC(=O)O",
+    "formule_brute": "C8H15NO3"
+  },
+  "groupe_principal": "acide carboxylique",
+  "prefixes_declasses": [
+    "amino",
+    "oxo"
+  ],
+  "raisonnement": "Acide > amide : en nomenclature classique (pré-2013), on privilégie la chaîne contenant le maximum de fonctions (5 C incluant le COOH et le C=O de l'amide) ; l'amide en bout de chaîne devient donc « 5-amino-5-oxo » avec un substituant éthyle en C4 et méthyle en C3.",
+  "atoms": [
+    {"id": "a0", "el": "O", "x": -112.1, "y": 12.5},
+    {"id": "a1", "el": "C", "x": -75.8, "y": -8.6},
+    {"id": "a2", "el": "O", "x": -75.9, "y": -50.6},
+    {"id": "a3", "el": "C", "x": -39.4, "y": 12.3},
+    {"id": "a4", "el": "C", "x": -3.0, "y": -8.7},
+    {"id": "a5", "el": "C", "x": -3.1, "y": -50.7},
+    {"id": "a6", "el": "C", "x": 33.4, "y": 12.2},
+    {"id": "a7", "el": "C", "x": 69.7, "y": -8.9},
+    {"id": "a8", "el": "N", "x": 106.1, "y": 12.0},
+    {"id": "a9", "el": "O", "x": 69.6, "y": -50.9},
+    {"id": "a10", "el": "C", "x": 33.5, "y": 54.2},
+    {"id": "a11", "el": "C", "x": -2.9, "y": 75.3}
+  ],
+  "bonds": [
+    ["a0", "a1", 1],
+    ["a1", "a2", 2],
+    ["a1", "a3", 1],
+    ["a3", "a4", 1],
+    ["a4", "a5", 1],
+    ["a4", "a6", 1],
+    ["a6", "a7", 1],
+    ["a7", "a8", 1],
+    ["a7", "a9", 2],
+    ["a6", "a10", 1],
+    ["a10", "a11", 1]
+  ]
+},
 {"id": 24, "nom": "acide 3-formyl-5-oxohexanoïque", "nom_en": "3-formyl-5-oxohexanoic acid", "categorie": "examen_mixte", "sections": ["acides_carboxyliques", "formyl", "prefixes_dechus", "duel_suffixe_prefixe"], "difficulte": 5, "structure": {"smiles": "CC(=O)CC(C=O)CC(=O)O", "formule_brute": "C7H10O4"}, "groupe_principal": "acide carboxylique", "prefixes_declasses": ["formyl", "oxo"], "raisonnement": "Acide > aldéhyde > cétone : « formyl » car le carbone de CHO est hors chaîne, « oxo » car le carbone de la cétone est dans la chaîne.", "atoms": [
 {"id": "a0", "el": "O", "x": -112.4, "y": 30.5},
 {"id": "a1", "el": "C", "x": -76.1, "y": 9.5},
